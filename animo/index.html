@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para la chica más especial</title>
+    <!-- Importamos fuentes elegantes de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           VARIABLES Y RESETEOS
+           ========================================= */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fce3ec 0%, #ffe8e8 50%, #f3e6ff 100%);
+            --env-back: #ffb3c6;
+            --env-pocket: #ff8fab;
+            --env-flap: #fb6f92;
+            --text-main: #4a3038;
+            --text-highlight: #d81b60;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-gradient);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Oculta partículas que salen de la pantalla */
+        }
+
+        /* =========================================
+           PARTÍCULAS DEL FONDO (Corazones y brillos)
+           ========================================= */
+        .particle {
+            position: absolute;
+            bottom: -5vh;
+            pointer-events: none;
+            opacity: 0;
+            animation: floatUp ease-in infinite;
+            z-index: 0;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.8));
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        /* =========================================
+           CONTENEDOR DEL SOBRE Y ANIMACIONES
+           ========================================= */
+        .wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: gentleFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Mensaje de "Toca para abrir" */
+        .tap-instruction {
+            position: absolute;
+            top: -45px;
+            color: var(--env-flap);
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 0.95rem;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        /* EL SOBRE (CSS Puro con Clip-Path) */
+        .envelope {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            background: var(--env-back);
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(251, 111, 146, 0.3);
+            cursor: pointer;
+            perspective: 1500px;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope:hover {
+            transform: scale(1.02);
+        }
+
+        /* Bolsillo frontal del sobre usando un polígono cortado en V */
+        .pocket {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--env-pocket);
+            /* El truco del polígono: dibuja los bordes y recorta un triángulo arriba */
+            clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 0, 50% 55%);
+            border-radius: 12px;
+            z-index: 4;
+            /* Sombra interna para dar volumen */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Solapa superior */
+        .flap {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--env-flap);
+            clip-path: polygon(0 0, 100% 0, 50% 55%);
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 5;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Sello de corazón */
+        .seal {
+            position: absolute;
+            top: 52%;
+            background: #fff;
+            color: var(--env-flap);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: opacity 0.4s ease;
+        }
+
+        /* =========================================
+           LA CARTA (Efecto Glassmorphism Aesthetic)
+           ========================================= */
+        .letter {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 90%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            z-index: 3; /* Detrás del bolsillo inicialmente */
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 35px 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            opacity: 0; /* Oculta el contenido visualmente antes de abrir */
+            backdrop-filter: blur(0px); /* Inicialmente sin desenfoque */
+            overflow: hidden;
+        }
+
+        /* Estilos del contenido de la carta */
+        .letter-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease 0.4s; /* Aparece después de que la carta sube */
+            width: 100%;
+        }
+
+        .title {
+            font-family: 'Great Vibes', cursive;
+            color: var(--text-highlight);
+            font-size: 2.8rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .body-text {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        /* Caja de énfasis elegante */
+        .emphasis-box {
+            background: rgba(255, 143, 171, 0.15);
+            border-left: 4px solid var(--env-flap);
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .emphasis-box p {
+            margin: 0;
+            font-weight: 600;
+            color: var(--env-flap);
+            font-size: 1.05rem;
+        }
+
+        /* Estilo de subrayado estético con marcador */
+        .marker-highlight {
+            background: linear-gradient(120deg, rgba(255, 179, 198, 0.5) 0%, rgba(255, 179, 198, 0.5) 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 35%;
+            background-position: 0 88%;
+            font-weight: 600;
+            color: var(--text-highlight);
+        }
+
+        .footer-text {
+            font-family: 'Great Vibes', cursive;
+            color: var(--env-flap);
+            font-size: 2rem;
+            margin-top: 25px;
+        }
+
+        /* =========================================
+           ESTADOS AL ABRIR EL SOBRE (Clase .open)
+           ========================================= */
+        
+        /* 1. La solapa se abre */
+        .wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 2; /* Se va hacia atrás para no tapar la carta */
+        }
+        
+        /* 2. El sello desaparece */
+        .wrapper.open .seal {
+            opacity: 0;
+        }
+
+        /* 3. La instrucción desaparece */
+        .wrapper.open .tap-instruction {
+            opacity: 0;
+        }
+
+        /* 4. La carta se extrae, se expande y se centra */
+        .wrapper.open .letter {
+            bottom: 50%;
+            /* translate(-50%, 50%) la centra perfectamente respecto a la pantalla */
+            transform: translate(-50%, 50%); 
+            width: 90vw;
+            max-width: 420px;
+            height: auto;
+            min-height: 480px;
+            opacity: 1;
+            /* Aumentamos el desenfoque de fondo al estar abierta */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        /* 5. El texto aparece suavemente */
+        .wrapper.open .letter-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Ajuste para pantallas muy pequeñas */
+        @media (max-width: 380px) {
+            .envelope { width: 280px; height: 190px; }
+            .title { font-size: 2.3rem; }
+            .body-text { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Elemento de audio para la música de fondo -->
+    <audio id="bg-music" src="1.mp3" loop></audio>
+
+    <!-- Contenedor principal con animación de flotación -->
+    <div class="wrapper" id="envelope-wrapper" onclick="openEnvelope()">
+        <div class="tap-instruction" id="instruction">Toca el sobre 💌</div>
+        
+        <div class="envelope">
+            <!-- Capa frontal/Bolsillo -->
+            <div class="pocket"></div>
+            
+            <!-- La carta -->
+            <div class="letter" id="letter">
+                <div class="letter-content">
+                    <h1 class="title">Para la chica más especial</h1>
+                    
+                    <p class="body-text">Quería escribirte esto para recordarte algo que a veces se nos olvida en los días grises.</p>
+                    
+                    <div class="emphasis-box">
+                        <p>No me gusta verte llorar.</p>
+                    </div>
+                    
+                    <p class="body-text">Tus ojos tienen una luz mágica que ilumina todo a tu alrededor. Eres una persona increíble, hermosa por dentro y por fuera.</p>
+                    
+                    <p class="body-text" style="margin-top: 20px;">Y aunque siempre te ves preciosa, quiero que sepas que...</p>
+                    
+                    <p class="body-text" style="font-size: 1.1rem; line-height: 1.7;">
+                        <span class="marker-highlight">Te ves mucho más linda cuando sonríes y estás alegre.</span>
+                    </p>
+                    
+                    <p class="footer-text">Nunca dejes de brillar ✨</p>
+                    
+                    <p class="body-text" style="margin-top: 20px; font-weight: 600; color: var(--text-highlight);">vamos a ver hh</p>
+                </div>
+            </div>
+
+            <!-- Solapa superior -->
+            <div class="flap">
+                <div class="seal">💖</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función principal para abrir la carta
+        function openEnvelope() {
+            const wrapper = document.getElementById('envelope-wrapper');
+            const letter = document.getElementById('letter');
+            const music = document.getElementById('bg-music');
+            
+            // Si ya está abierta, no hacemos nada extra
+            if(wrapper.classList.contains('open')) return;
+
+            // Reproducimos la música de fondo al hacer clic
+            music.play().catch(e => console.log("El navegador bloqueó el autoplay", e));
+
+            // Añadimos la clase que dispara todas las animaciones CSS
+            wrapper.classList.add('open');
+            
+            // Pausamos la animación de flotar del sobre para que sea cómodo de leer
+            wrapper.style.animation = 'none';
+
+            // Truco de Z-Index:
+            // La carta empieza con z-index 3 (detrás del bolsillo). 
+            // Esperamos a que la carta suba y salga del sobre (aprox 400ms), 
+            // y entonces la pasamos al frente (z-index 20) para que cubra todo.
+            setTimeout(() => {
+                letter.style.zIndex = '20';
+            }, 400);
+        }
+
+        // Sistema generador de partículas (Fondo animado mágico)
+        function createParticles() {
+            const symbols = ['💖', '✨', '🌸', '🤍'];
+            const container = document.body;
+
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Símbolo aleatorio
+                particle.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                
+                // Posición horizontal aleatoria
+                particle.style.left = Math.random() * 100 + 'vw';
+                
+                // Duración aleatoria (entre 6 y 10 segundos)
+                const duration = Math.random() * 4 + 6;
+                particle.style.animationDuration = duration + 's';
+                
+                // Tamaño aleatorio
+                particle.style.fontSize = (Math.random() * 1.5 + 0.8) + 'rem';
+                
+                container.appendChild(particle);
+
+                // Limpieza de DOM para no consumir memoria
+                setTimeout(() => {
+                    particle.remove();
+                }, duration * 1000);
+
+            }, 400); // Crea una partícula cada 400ms
+        }
+
+        // Iniciamos las partículas al cargar la página
+        window.onload = createParticles;
+    </script>
+</body>
+</html>
